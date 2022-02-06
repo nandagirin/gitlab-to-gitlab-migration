@@ -1,0 +1,4 @@
+requests
+ansible==3
+hvac
+ansible-modules-hashivault
