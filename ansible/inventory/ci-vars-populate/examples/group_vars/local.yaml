@@ -1,0 +1,19 @@
+---
+ci_variables:
+  - source_var_level: project
+    source_id: 'XXX' # source project id
+    source_var_key: 'DB_HOST'
+    dest_var_level: group
+    dest_id: 'XXXXXXX' # destination group id
+  - source_var_level: admin
+    source_id: ci
+    source_var_key: 'CONTAINER_REGISTRY_TOKEN'
+    dest_var_level: project
+    dest_id: 'XXXXXXX'
+    dest_var_key: 'CONTAINER_REGISTRY_TOKEN'
+  - source_var_level: group
+    source_id: 'XXX'
+    source_var_key: 'GOPRIVATE'
+    dest_var_level: group
+    dest_id: 'XXXXXXX'
+...
