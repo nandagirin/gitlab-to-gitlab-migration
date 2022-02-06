@@ -1,0 +1,12 @@
+---
+- name: Populate variables from source to destination gitlab
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Populate variables
+      include_tasks: tasks/populate-vars-from-source-to-dest-gitlab.yaml
+      vars:
+        ci_variable: '{{ item }}'
+      loop: '{{ ci_variables }}'
+...

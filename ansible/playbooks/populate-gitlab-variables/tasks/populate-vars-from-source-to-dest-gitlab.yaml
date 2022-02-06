@@ -1,0 +1,70 @@
+---
+- set_fact:
+    source_var_level_specifier: groups
+  when: ci_variable.source_var_level == 'group'
+  no_log: true
+
+- set_fact:
+    source_var_level_specifier: projects
+  when: ci_variable.source_var_level == 'project'
+  no_log: true
+
+- set_fact:
+    source_var_level_specifier: admin
+  when: ci_variable.source_var_level == 'admin'
+  no_log: true
+
+- set_fact:
+    dest_var_level_specifier: groups
+  when: ci_variable.dest_var_level == 'group'
+  no_log: true
+
+- set_fact:
+    dest_var_level_specifier: projects
+  when: ci_variable.dest_var_level == 'project'
+  no_log: true
+
+- set_fact:
+    dest_var_level_specifier: admin
+  when: ci_variable.dest_var_level == 'admin'
+  no_log: true
+
+- name: Get {{ ci_variable.source_var_key }} variable detail from source gitlab {{ ci_variable.source_var_level }} {{ ci_variable.source_id }}
+  ansible.builtin.uri:
+    url: '{{ source_gitlab_url }}/api/v4/{{ source_var_level_specifier }}/{{ ci_variable.source_id }}/variables/{{ ci_variable.source_var_key }}'
+    validate_certs: no
+    return_content: yes
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      PRIVATE-TOKEN: "{{ source_gitlab_personal_access_token }}"
+    status_code: [200, 201]
+  register: result
+  ignore_errors: yes
+
+- set_fact:
+    variable_json: '{{ result.json }}'
+  no_log: true
+
+- set_fact:
+    variable_key: '{{ ci_variable.dest_var_key | default(variable_json.key) }}'
+    variable_value: '{{ variable_json.value }}'
+    variable_type: '{{ variable_json.variable_type }}'
+    variable_protected: '{{ variable_json.protected }}'
+    variable_masked: '{{ variable_json.masked }}'
+    variable_environment_scope: '{{ variable_json.environment_scope | default("*") }}'
+  no_log: true
+
+- name: Create {{ ci_variable.dest_var_key | default(variable_json.key) }} variable detail in destination gitlab {{ ci_variable.dest_var_level }} {{ ci_variable.dest_id }}
+  ansible.builtin.uri:
+    url: '{{ dest_gitlab_url }}/api/v4/{{ dest_var_level_specifier }}/{{ ci_variable.dest_id }}/variables'
+    validate_certs: no
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      PRIVATE-TOKEN: "{{ dest_gitlab_personal_access_token }}"
+    body_format: json
+    body: "{{ lookup('template', playbook_dir + '/templates/gitlab-variables.json') }}"
+    status_code: [200, 201]
+  ignore_errors: yes
+...

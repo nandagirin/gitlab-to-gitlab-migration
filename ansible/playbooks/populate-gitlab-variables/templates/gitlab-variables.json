@@ -1,0 +1,8 @@
+{
+  "key": "{{ variable_key }}",
+  "value": "{{ variable_value }}",
+  "variable_type": "{{ variable_type }}",
+  "protected": "{{ variable_protected }}",
+  "masked": "{{ variable_masked }}",
+  "environment_scope": "{{ variable_environment_scope }}"
+}
